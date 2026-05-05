@@ -1,23 +1,48 @@
 pipeline {
     agent any
 
+    environment {
+        AWS_DEFAULT_REGION = 'ap-south-1'
+    }
+
     stages {
 
         stage('Terraform Init') {
             steps {
-                bat 'terraform init'
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-creds',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+
+                    bat '"C:\\ProgramData\\chocolatey\\bin\\bin\\terraform.exe" init'
+                }
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                bat 'terraform plan'
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-creds',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+
+                    bat '"C:\\ProgramData\\chocolatey\\bin\\bin\\terraform.exe" plan'
+                }
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                bat 'terraform apply -auto-approve'
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-creds',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+
+                    bat '"C:\\ProgramData\\chocolatey\\bin\\bin\\terraform.exe" apply -auto-approve'
+                }
             }
         }
     }
